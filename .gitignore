@@ -1,0 +1,9 @@
+.env
+_video_kit/entorno/
+Videos/**/*.mp4
+Videos/**/*.mp3
+node_modules/
+_tools/node_modules/
+*.tmp
+_tools/_tmp_*.js
+_tools/_tmp_*.py
