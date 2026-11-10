@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <!--
+      PLANTILLA DE VIDEO POR TEMA · Tema {{ID}} · {{TITULO}}
+      ESTRUCTURA FIJA (no cambiar): [INTRO {{INTRO}}s con LogoCurso.png] → [CONTENIDO = narración {{NARR}}s] → [pausa] → [CIERRE con logo ETC Iberoamérica].
+      Lo que SÍ se escribe por tema: las escenas de contenido (bloque "ESCENAS DE CONTENIDO") y sus animaciones (bloque "ANIMACIONES DE CONTENIDO").
+      Todas las marcas de tiempo de contenido se escriben como at(t), donde t = segundo dentro de la NARRACIÓN (ver cues.txt); at() suma la intro.
+      Patrones de escena: helpers wipe() y swap() más abajo; reglas de diseño en _video_kit/template/DESIGN.md
+      Reglas de HyperFrames: sin exits antes de un barrido, sin Math.random, timelines síncronos, ver _video_kit/template/DESIGN.md
+    -->
+    <style>
+      @font-face { font-family: "Fraunces"; src: url("assets/fonts/fraunces.woff2") format("woff2"); font-weight: 100 900; font-style: normal; }
+      @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-style: normal; }
+      :root { --bg: #0b2238; --surface: #123a5c; --text: #eaf4fb; --muted: #9fbdd6; --accent: #4fb3ea; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--text); font-family: "Fraunces", serif; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+
+      /* ---------- fondo persistente del contenido (navy + cuadrícula) ---------- */
+      #bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+      #grid { position: absolute; inset: -80px;
+        background-image: linear-gradient(rgba(79,179,234,0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(79,179,234,0.07) 2px, transparent 2px);
+        background-size: 80px 80px; }
+      .glow { position: absolute; border-radius: 50%; }
+      #glow1 { width: 1100px; height: 1100px; left: -300px; top: -400px; background: radial-gradient(circle, rgba(79,179,234,0.16) 0%, rgba(79,179,234,0) 65%); }
+      #glow2 { width: 1000px; height: 1000px; right: -300px; bottom: -450px; background: radial-gradient(circle, rgba(26,111,163,0.28) 0%, rgba(26,111,163,0) 65%); }
+      #progress { position: absolute; left: 0; bottom: 0; height: 6px; width: 100%; background: var(--accent); transform-origin: left center; z-index: 100; visibility: hidden; }
+      #brand { position: absolute; left: 100px; bottom: 30px; z-index: 100; font-family: "JetBrains Mono", monospace; font-size: 22px;
+        letter-spacing: .12em; color: var(--muted); opacity: .7; text-transform: uppercase; visibility: hidden; }
+
+      /* ---------- bloques base de contenido ---------- */
+      .scene { position: absolute; inset: 0; overflow: hidden; }
+      #s1 { z-index: 1; visibility: hidden; } /* se muestra con tl.set al inicio (ver abajo); evita falsos avisos de contraste del validador */
+      /* escenas 2+: opacity:0 + visibility:hidden + clip-path inset(0 100% 0 0) y z-index ascendente (ver wipe(); visibility evita falsos avisos de contraste del validador) */
+      .pad { width: 100%; height: 100%; padding: 90px 140px 100px; display: flex; flex-direction: column; }
+      .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+      .chip { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 38px; color: var(--text); background: rgba(18,58,92,.85);
+        border: 3px solid rgba(79,179,234,.55); border-radius: 999px; padding: 14px 34px; white-space: nowrap; }
+      .chip.fill { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+      .swap { display: grid; } .swap > * { grid-area: 1 / 1; }
+      .h1 { font-size: 118px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+      .h1 em { font-style: normal; color: var(--accent); }
+      .sub { font-size: 42px; font-weight: 300; color: var(--muted); margin-top: 12px; }
+
+      /* ---------- INTRO y CIERRE (pantallas de marca sobre fondo claro) ---------- */
+      .brandscreen { position: absolute; inset: 0; z-index: 200; background: #fbfdff; overflow: hidden;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .bwrap { position: relative; display: flex; flex-direction: column; align-items: center; }
+      .bbar { width: 280px; height: 8px; border-radius: 4px; background: #1a6fa3; transform-origin: left center; margin-top: 56px; }
+      #intro-logo { width: 1000px; height: auto; display: block; }
+      #outro { opacity: 0; visibility: hidden; clip-path: inset(0 100% 0 0); }
+      #outro-kicker { font-family: "JetBrains Mono", monospace; font-size: 34px; letter-spacing: .24em; text-transform: uppercase; color: #123a5c; margin-bottom: 48px; }
+      #outro-logo { width: 900px; height: auto; display: block; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{TOTAL}}" data-width="1920" data-height="1080">
+      <!-- La pista de audio real se mezcla al final con `kit.py render` (el mezclador de HyperFrames recorta el audio); esta etiqueta solo sirve para la vista previa -->
+      <audio id="narr" data-start="{{INTRO}}" data-duration="{{NARR}}" data-track-index="2" src="narration.mp3" data-volume="1"></audio>
+
+      <div id="bg"><div id="grid"></div><div class="glow" id="glow1"></div><div class="glow" id="glow2"></div></div>
+
+      <!-- ================= ESCENAS DE CONTENIDO (reemplazar/extender por tema) ================= -->
+      <section class="scene" id="s1"><div class="pad" style="justify-content:center; gap:30px;">
+        <div class="eyebrow" id="s1-eyebrow">Tema {{ID}}</div>
+        <div class="h1" id="s1-title">{{TITULO}}</div>
+      </div></section>
+      <!-- ================= FIN ESCENAS DE CONTENIDO ================= -->
+
+      <div id="brand">{{CURSO}}</div>
+      <div id="progress"></div>
+
+      <!-- ================= INTRO (LogoCurso.png) ================= -->
+      <section class="brandscreen" id="intro">
+        <div class="bwrap"><img id="intro-logo" src="assets/LogoCurso.png" alt="{{CURSO}}" /><div class="bbar" id="intro-bar"></div></div>
+      </section>
+
+      <!-- ================= CIERRE (ETC Iberoamérica) ================= -->
+      <section class="brandscreen" id="outro">
+        <div class="bwrap" id="outro-content">
+          <div id="outro-kicker">Un curso desarrollado por</div>
+          <img id="outro-logo" src="assets/etc_iberoamerica_logo.svg" alt="ETC Iberoamérica" />
+          <div class="bbar" id="outro-bar"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const ACC = "#4fb3ea", DIM = "rgba(79,179,234,0.25)";
+      const INTRO = {{INTRO}};   // duración de la intro (≤ 3 s, incluye el barrido de salida)
+      const NARR  = {{NARR}};    // duración real de narration.mp3
+      const END   = {{END}};     // inicio del cierre = INTRO + NARR + pausa
+      const TOTAL = {{TOTAL}};   // duración total del video
+      const at = (t) => INTRO + t; // t = segundo dentro de la narración (cues.txt)
+
+      /* ---- helpers de contenido ---- */
+      // Barrido de escena: la nueva aparece de izquierda a derecha; la saliente se apaga al terminar (nunca antes).
+      function wipe(sel, t, prev) {
+        tl.set(sel, { opacity: 1, visibility: "visible" }, t);
+        tl.set(prev, { opacity: 0, visibility: "hidden", display: "none" }, t + 0.72);
+        tl.fromTo(sel, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.inOut" }, t);
+      }
+      // Cambio de encabezado/subtítulo dentro de una escena (elementos con opacity:0 inicial dentro de un .swap)
+      function swap(out, inn, t) {
+        tl.to(out, { opacity: 0, y: -28, duration: 0.35, ease: "power2.in" }, t);
+        tl.fromTo(inn, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, t + 0.25);
+      }
+
+      /* ---- ambiente del video (no tocar) ---- */
+      tl.to("#grid", { x: -80, y: -80, duration: TOTAL, ease: "none" }, 0);
+      tl.to("#glow1", { scale: 1.15, duration: TOTAL / 2, ease: "sine.inOut" }, 0);
+      tl.to("#glow1", { scale: 1.0, duration: TOTAL / 2, ease: "sine.inOut" }, TOTAL / 2);
+      tl.to("#glow2", { scale: 1.2, duration: TOTAL / 2, ease: "sine.inOut" }, 0);
+      tl.to("#glow2", { scale: 1.0, duration: TOTAL / 2, ease: "sine.inOut" }, TOTAL / 2);
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: NARR, ease: "none" }, INTRO);
+
+      /* ---- INTRO: logo del curso; sale con barrido a INTRO (la narración arranca en INTRO) ---- */
+      tl.from("#intro-logo", { opacity: 0, scale: 0.94, y: 24, duration: 0.8, ease: "power3.out" }, 0.15);
+      tl.from("#intro-bar", { scaleX: 0, duration: 0.7, ease: "power2.inOut" }, 0.6);
+      tl.to("#intro", { clipPath: "inset(0 0 0 100%)", duration: 0.6, ease: "power3.inOut" }, INTRO - 0.6);
+      tl.set("#intro", { autoAlpha: 0 }, INTRO + 0.01);
+      // brand y progress solo existen mientras se ve el contenido (evita solaparse con las pantallas de marca claras)
+      tl.set("#brand, #progress", { visibility: "visible" }, INTRO);
+      tl.set("#s1", { visibility: "visible" }, 0.05);
+
+      /* ================= ANIMACIONES DE CONTENIDO (reemplazar/extender por tema) ================= */
+      tl.from("#s1-eyebrow", { y: -24, opacity: 0, duration: 0.6, ease: "power2.out" }, at(0.3));
+      tl.from("#s1-title", { y: 60, opacity: 0, duration: 0.8, ease: "power3.out" }, at(0.6));
+      // Ejemplo de segunda escena:  wipe("#s2", at(17.3), "#s1");   (definir <section id="s2"> con opacity:0 y clip-path inset(0 100% 0 0), z-index 2)
+      /* ================= FIN ANIMACIONES DE CONTENIDO ================= */
+
+      /* ---- CIERRE: logo ETC Iberoamérica; único momento con salida (última escena) ---- */
+      tl.set("#brand, #progress", { visibility: "hidden" }, END);
+      tl.set("#outro", { autoAlpha: 1 }, END);
+      tl.fromTo("#outro", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.inOut" }, END);
+      tl.from("#outro-kicker", { y: -20, opacity: 0, duration: 0.6, ease: "power2.out" }, END + 0.8);
+      tl.from("#outro-logo", { opacity: 0, scale: 0.94, y: 24, duration: 0.8, ease: "power3.out" }, END + 1.0);
+      tl.from("#outro-bar", { scaleX: 0, duration: 0.7, ease: "power2.inOut" }, END + 1.5);
+      tl.to("#outro-content", { opacity: 0, duration: 0.6, ease: "power2.in" }, TOTAL - 0.7);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
