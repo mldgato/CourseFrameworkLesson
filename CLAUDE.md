@@ -35,6 +35,7 @@ Viven en `.claude/commands/`. Los comandos de contenido trabajan **por lección*
 | `/activities-lesson 1.1` | Por lección | Genera todas las actividades HTML interactivas de la lección |
 | `/html-lesson 1.1` | Por lección | Genera todos los fragmentos HTML del ebook de la lección |
 | `/videos-lesson 1.1` | Por lección (solo cuando se pide) | Produce un video por cada tema de la lección |
+| `/videos-eval-lesson 1.1` | Por lección (solo cuando se pide) | Produce videos con pausas H5P + Word con 2 preguntas por tema |
 
 ---
 
