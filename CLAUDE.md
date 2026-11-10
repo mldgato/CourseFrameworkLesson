@@ -42,11 +42,13 @@ Viven en `.claude/commands/`. Los comandos de contenido trabajan **por lección*
 ## Flujo de trabajo por lección
 
 ```
-/word-lesson X.Y      →   revisa el Word completo de la lección
-/questions-lesson X.Y →   revisa todas las preguntas
-/activities-lesson X.Y→   revisa cada actividad en el navegador
-/html-lesson X.Y      →   revisa todos los fragmentos HTML
-/videos-lesson X.Y    →   solo cuando el usuario lo pida
+/word-lesson X.Y           →   revisa el Word completo de la lección
+/questions-lesson X.Y      →   revisa todas las preguntas
+/activities-lesson X.Y     →   revisa cada actividad en el navegador
+/html-lesson X.Y           →   revisa todos los fragmentos HTML
+/videos-lesson X.Y         →   solo cuando el usuario lo pida
+/videos-eval-lesson X.Y    →   alternativa a /videos-lesson con pausas de evaluación H5P
+                                (genera un MP4 + Word con 2 preguntas por cada tema)
 ```
 
 ---

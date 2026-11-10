@@ -16,7 +16,7 @@ PDF del examen ─ /init-course ─► course.config.js (unidades → lecciones 
            └── /exam-import ──►  preguntas_por_tema.json (alimenta los skills siguientes)
                                          │
                                          ▼
- /word-lesson → /questions-lesson → /activities-lesson → /html-lesson → (/videos-lesson)
+ /word-lesson → /questions-lesson → /activities-lesson → /html-lesson → (/videos-lesson | /videos-eval-lesson)
 ```
 
 ## Requisitos
@@ -26,8 +26,8 @@ PDF del examen ─ /init-course ─► course.config.js (unidades → lecciones 
 | [Claude Code](https://claude.com/claude-code) | Ejecutar los comandos | Sí |
 | Node.js 18+ | Generar Word y probar actividades | Sí |
 | Python 3.9+ | Leer el PDF (`pymupdf`), convertir Word a HTML y generar Excel (`openpyxl`) | Sí |
-| Google Chrome | Renderizar los videos | Solo para `/videos-lesson` |
-| Cuenta de ElevenLabs + clave API (`.env`) | Voz de los videos | Solo para `/videos-lesson` |
+| Google Chrome | Renderizar los videos | Solo para `/videos-lesson` y `/videos-eval-lesson` |
+| Cuenta de ElevenLabs + clave API (`.env`) | Voz de los videos | Solo para `/videos-lesson` y `/videos-eval-lesson` |
 
 Funciona en Windows, Mac y Linux.
 
@@ -87,6 +87,7 @@ de cada skill antes de pasar al siguiente.
 | `/activities-lesson 1.1` | Todas las actividades HTML interactivas de la lección | `…/Actividades/` |
 | `/html-lesson 1.1` | Todos los fragmentos HTML del ebook de la lección | `…/Contenido HTML/` |
 | `/videos-lesson 1.1` | Un video por cada tema de la lección (ElevenLabs) | `Videos/Unidad N/` |
+| `/videos-eval-lesson 1.1` | Un video con pausas de evaluación H5P + Word con 2 preguntas por cada tema (solo si lo pides) | `Videos/Unidad N/` |
 
 > Si ya ejecutaste `/exam-import`, los skills leen automáticamente las preguntas del examen para
 > cada tema y alinean el enfoque del contenido.
@@ -94,6 +95,9 @@ de cada skill antes de pasar al siguiente.
 ## Videos con voces de ElevenLabs
 
 `/videos-lesson X.Y` produce un `.mp4` por cada tema de la lección, en orden.
+
+`/videos-eval-lesson X.Y` hace lo mismo pero incluye cues orales de pausa ("Hagamos una pausa aquí para evaluar…") en puntos narrativos naturales, y genera además un `.docx` por tema con las dos preguntas de opción múltiple (timestamp, 4 opciones, respuesta correcta, retroalimentación) listo para configurar en H5P Interactive Video (Lumi, Moodle, WordPress o `h5p-standalone`).
+
 Para configurar la clave de ElevenLabs:
 
 1. **Crear la clave** en [elevenlabs.io](https://elevenlabs.io) → *Developers* → *API Keys*.
@@ -130,9 +134,9 @@ Notas:
 | `Cannot find module 'docx'` | Ejecuta `node setup.js` (o `cd _tools && npm install`). |
 | `python3` no existe (Windows) | Usa `python`. Los comandos detectan cuál existe. |
 | `/exam-import`: no encuentra la carpeta | Crea `certificación/` con al menos una subcarpeta y capturas dentro. |
-| `/videos-lesson`: falta `ELEVENLABS_API_KEY` | Falta `.env` o la clave sigue como `pega_aqui_tu_clave`. |
-| `/videos-lesson`: falta ffmpeg | Ejecuta `python _video_kit/kit.py setup`. |
-| `/videos-lesson`: `402 paid_plan_required` | La voz requiere plan de pago en ElevenLabs. |
+| `/videos-lesson` / `/videos-eval-lesson`: falta `ELEVENLABS_API_KEY` | Falta `.env` o la clave sigue como `pega_aqui_tu_clave`. |
+| `/videos-lesson` / `/videos-eval-lesson`: falta ffmpeg | Ejecuta `python _video_kit/kit.py setup`. |
+| `/videos-lesson` / `/videos-eval-lesson`: `402 paid_plan_required` | La voz requiere plan de pago en ElevenLabs. |
 
 ## Estructura
 
@@ -150,6 +154,7 @@ requirements.txt          ← dependencias de Python (pymupdf, openpyxl)
   activities-lesson.md    ← skill: actividades interactivas de la lección
   html-lesson.md          ← skill: fragmentos HTML de la lección
   videos-lesson.md        ← skill: videos de todos los temas de la lección
+  videos-eval-lesson.md   ← skill: videos con pausas H5P + Word de preguntas por tema
   videos.md               ← skill: video individual por tema (mismo que CourseFramework)
 _fuente-assets/           ← runtime de actividades (no tocar)
 _tools/                   ← herramientas internas (no tocar)
