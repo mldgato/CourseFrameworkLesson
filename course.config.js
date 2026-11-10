@@ -10,6 +10,11 @@ module.exports = {
   certification: "",            // certificación objetivo
   courseName:    "",            // nombre corto para encabezados
 
+  /* ── Estilo gráfico ─────────────────────────────────────── */
+  // Opciones: "ocean" | "forest" | "obsidian" | "amber" | "crimson"
+  // Para elegir, abre _tools/theme-gallery.html en el navegador.
+  theme: "ocean",
+
   palette: {
     navy:  "1F3864",
     steel: "2E5496",

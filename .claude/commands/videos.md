@@ -35,6 +35,8 @@ python _video_kit/kit.py doctor
 
 Además valida que el tema exista en `course.config.js` (unidades → lecciones → temas). Si no existe, dilo y detente.
 
+**Estilo gráfico del video:** lee `course.config.js → theme`, carga `_tools/themes.json` y localiza el objeto con ese `id`. Extrae la sección `video` del tema: `bg`, `surface`, `text`, `text2`, `accent`, `introBg`, `introGrid`, `introBar`, `fontHeading`, `fontMono`, `fontHeadingFile`, `fontMonoFile`. Usa estos valores en las escenas del video (ver Paso 4 y `DESIGN.md`). Si el archivo de fuente indicado en `fontHeadingFile` no existe en `_video_kit/template/assets/fonts/`, usa `fraunces.woff2` como fallback; ídem para `fontMonoFile`. Si el tema tiene `"noGrid": true`, **omite cualquier `background-image` de cuadrícula** tanto en las escenas de contenido como en las pantallas de intro y cierre — el fondo debe ser liso en todos los casos.
+
 ## Paso 1. Scaffolding
 ```bash
 python _video_kit/kit.py scaffold X.Y.Z

@@ -36,6 +36,8 @@ python _video_kit/kit.py doctor
   Nunca pedir la clave en el chat.
 - Si dice "sin temas: corre /init-course": indica al autor que ejecute `/init-course` primero.
 
+**Estilo gráfico del video:** lee `course.config.js → theme`, carga `_tools/themes.json` y localiza el objeto con ese `id`. Extrae la sección `video` del tema: `bg`, `surface`, `text`, `text2`, `accent`, `introBg`, `introGrid`, `introBar`, `fontHeading`, `fontMono`, `fontHeadingFile`, `fontMonoFile`. Aplica estos valores en todas las escenas. Si el archivo de fuente indicado en `fontHeadingFile` no existe en `_video_kit/template/assets/fonts/`, usa `fraunces.woff2` como fallback; ídem para `fontMonoFile`. Si el tema tiene `"noGrid": true`, **omite cualquier `background-image` de cuadrícula** tanto en las escenas de contenido como en las pantallas de intro y cierre — el fondo debe ser liso en todos los casos.
+
 Lee `course.config.js` → encuentra la lección X.Y y la lista de temas. Muestra al autor:
 ```
 Lección X.Y – [Título]

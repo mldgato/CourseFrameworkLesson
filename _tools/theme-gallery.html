@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selector de Estilo Gráfico — CourseFramework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;700&family=IBM+Plex+Mono:wght@400;700&family=Source+Code+Pro:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+  .page-header p {
+    color: #94a3b8;
+    font-size: 1rem;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .themes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 28px;
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  .theme-card {
+    background: #1e293b;
+    border: 2px solid #334155;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .theme-card:hover {
+    border-color: #64748b;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .theme-card.selected {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.25), 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .brand-card {
+    border-color: #e87020;
+  }
+  .brand-card:hover {
+    border-color: #e87020;
+    box-shadow: 0 0 0 1px rgba(232,112,32,0.3), 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .brand-badge {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: #e87020;
+    color: #fff;
+  }
+
+  /* ── Video preview (dark side) ── */
+  .video-preview {
+    padding: 28px 24px 20px;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .video-preview.has-grid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .video-preview .label-video {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    color: inherit;
+  }
+  .video-preview .obj-tag {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 3px;
+  }
+  .video-preview .scene-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .video-preview .scene-sub {
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    opacity: 0.75;
+    position: relative;
+    max-width: 300px;
+  }
+  .accent-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+  }
+
+  /* ── Ebook preview (light side) ── */
+  .ebook-preview {
+    padding: 20px 20px 16px;
+    position: relative;
+  }
+  .ebook-preview .label-ebook {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 10px;
+    color: #334155;
+  }
+  .ebook-inner {
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 16px;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .ebook-inner h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+  .ebook-inner .callout {
+    border-left: 3px solid;
+    padding: 8px 10px;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    margin-top: 8px;
+  }
+  .ebook-inner .obj-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 7px;
+  }
+
+  /* ── Activity preview ── */
+  .activity-preview {
+    padding: 16px 20px 20px;
+    border-top: 1px solid #1e293b;
+  }
+  .activity-preview .label-act {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 10px;
+    color: #94a3b8;
+  }
+  .act-card {
+    border: 1px solid;
+    border-radius: var(--act-radius, 6px);
+    overflow: hidden;
+  }
+  .act-card-header {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .act-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+  .act-card-body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .act-option {
+    padding: 7px 12px;
+    border: 1px solid;
+    border-radius: calc(var(--act-radius, 6px) - 2px);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .act-option .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid;
+    flex-shrink: 0;
+  }
+
+  /* ── Footer / palette + select ── */
+  .theme-footer {
+    padding: 14px 20px 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .palette-swatches {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+  .theme-id-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-family: 'Fira Code', 'Courier New', monospace;
+  }
+  .select-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .select-btn:hover { opacity: 0.85; transform: scale(1.02); }
+  .select-btn:active { transform: scale(0.98); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #22c55e;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+    opacity: 0;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  #toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ── Instructions panel ── */
+  .instructions {
+    max-width: 640px;
+    margin: 56px auto 0;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 28px 32px;
+  }
+  .instructions h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 16px;
+  }
+  .instructions ol {
+    padding-left: 20px;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    line-height: 2;
+  }
+  .instructions code {
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82em;
+  }
+  .instructions .selected-display {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: #0f172a;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-family: 'Fira Code', monospace;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+  .instructions .selected-display span {
+    color: #38bdf8;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Elige el estilo gráfico de tu curso</h1>
+  <p>Cada tema define los colores, la tipografía y el estilo de los componentes
+  para las actividades, el ebook HTML y los videos. Haz clic en <strong>Seleccionar</strong>
+  y sigue las instrucciones al final de la página.</p>
+</div>
+
+<div class="themes-grid" id="themesGrid"></div>
+
+<div class="instructions">
+  <h2>Cómo aplicar tu elección</h2>
+  <ol>
+    <li>Haz clic en <strong>Seleccionar</strong> en el tema que prefieras.</li>
+    <li>Abre <code>course.config.js</code> en la raíz del proyecto.</li>
+    <li>Busca el campo <code>theme</code> y cambia su valor al ID del tema elegido.</li>
+    <li>Guarda el archivo. Todos los contenidos que generes usarán ese estilo.</li>
+  </ol>
+  <div class="selected-display" id="selectedDisplay">
+    — Ningún tema seleccionado aún —
+  </div>
+</div>
+
+<div id="toast">✓ ID copiado al portapapeles</div>
+
+<script>
+const themes = [
+  {
+    id: "ocean",
+    name: "Ocean",
+    description: "Azul marino — el estilo original",
+    video: { bg:"#0b2238", surface:"#123a5c", text:"#eaf4fb", text2:"#9fbdd6", accent:"#4fb3ea" },
+    ebook: { gridBg:"#fbfdff", gridLine:"#e3edf5", heading:"#1f3864", subheading:"#2e5496",
+             text:"#1e2f3f", calloutBg:"#eaf4fb", calloutBorder:"#2e5496",
+             fontHeading:"system-ui, Helvetica, sans-serif", objBadgeBg:"#dbeafe", objBadgeText:"#1e40af" },
+    activity: { bg:"#f0f4f8", surface:"#ffffff", border:"#dce8f4", text:"#0f2535", text2:"#4a7291",
+                accent:"#4f46e5", accentLight:"#ede9fe", badgePractice:"#3b82f6",
+                radius:"6px", fontHeading:"system-ui, Helvetica, sans-serif" },
+    swatches: ["#0b2238","#4fb3ea","#1f3864","#4f46e5","#f0f4f8"],
+    btnColor: "#1a6fa3",
+  },
+  {
+    id: "forest",
+    name: "Forest",
+    description: "Verde esmeralda — fresco y tecnológico",
+    video: { bg:"#071a0f", surface:"#0d3320", text:"#e8f5ed", text2:"#7abf99", accent:"#34d399" },
+    ebook: { gridBg:"#f7fcf9", gridLine:"#c6e8d7", heading:"#064e3b", subheading:"#047857",
+             text:"#0d2b1f", calloutBg:"#ecfdf5", calloutBorder:"#047857",
+             fontHeading:"'Plus Jakarta Sans', Helvetica, sans-serif", objBadgeBg:"#d1fae5", objBadgeText:"#064e3b" },
+    activity: { bg:"#f0faf5", surface:"#ffffff", border:"#a7f3d0", text:"#052e1e", text2:"#2d7a5a",
+                accent:"#059669", accentLight:"#ecfdf5", badgePractice:"#059669",
+                radius:"4px", fontHeading:"'Plus Jakarta Sans', Helvetica, sans-serif" },
+    swatches: ["#071a0f","#34d399","#064e3b","#059669","#f0faf5"],
+    btnColor: "#059669",
+  },
+  {
+    id: "obsidian",
+    name: "Obsidian",
+    description: "Pizarra con violeta — moderno y denso",
+    video: { bg:"#120e28", surface:"#1e1b4b", text:"#ede9fe", text2:"#a5b4fc", accent:"#818cf8" },
+    ebook: { gridBg:"#f9f9ff", gridLine:"#ddd6fe", heading:"#2e1065", subheading:"#5b21b6",
+             text:"#1c1033", calloutBg:"#ede9fe", calloutBorder:"#5b21b6",
+             fontHeading:"'DM Sans', Helvetica, sans-serif", objBadgeBg:"#ede9fe", objBadgeText:"#4c1d95" },
+    activity: { bg:"#f5f3ff", surface:"#ffffff", border:"#ddd6fe", text:"#1c1033", text2:"#6d4fa8",
+                accent:"#7c3aed", accentLight:"#f5f3ff", badgePractice:"#7c3aed",
+                radius:"12px", fontHeading:"'DM Sans', Helvetica, sans-serif" },
+    swatches: ["#120e28","#818cf8","#2e1065","#7c3aed","#f5f3ff"],
+    btnColor: "#6d28d9",
+  },
+  {
+    id: "amber",
+    name: "Amber",
+    description: "Ámbar cálido — sereno y editorial",
+    video: { bg:"#1a1005", surface:"#331e08", text:"#fef3c7", text2:"#d4a85f", accent:"#f59e0b" },
+    ebook: { gridBg:"#fffdf5", gridLine:"#f0e0a0", heading:"#78350f", subheading:"#b45309",
+             text:"#2c1810", calloutBg:"#fef3c7", calloutBorder:"#b45309",
+             fontHeading:"'Lora', Georgia, serif", objBadgeBg:"#fef3c7", objBadgeText:"#78350f" },
+    activity: { bg:"#fffdf5", surface:"#ffffff", border:"#fde68a", text:"#2c1810", text2:"#92400e",
+                accent:"#d97706", accentLight:"#fffbeb", badgePractice:"#b45309",
+                radius:"8px", fontHeading:"'Lora', Georgia, serif" },
+    swatches: ["#1a1005","#f59e0b","#78350f","#d97706","#fffdf5"],
+    btnColor: "#b45309",
+  },
+  {
+    id: "crimson",
+    name: "Crimson",
+    description: "Carmesí — dramático y sofisticado",
+    video: { bg:"#1a0608", surface:"#350a10", text:"#ffe4e6", text2:"#f4a4b0", accent:"#f43f5e" },
+    ebook: { gridBg:"#fff9fa", gridLine:"#fecdd3", heading:"#7f1d1d", subheading:"#b91c1c",
+             text:"#2c0a0a", calloutBg:"#ffe4e6", calloutBorder:"#b91c1c",
+             fontHeading:"'Cormorant Garamond', Georgia, serif", objBadgeBg:"#ffe4e6", objBadgeText:"#7f1d1d" },
+    activity: { bg:"#fff9fa", surface:"#ffffff", border:"#fecdd3", text:"#2c0a0a", text2:"#9f3444",
+                accent:"#e11d48", accentLight:"#fff1f2", badgePractice:"#be123c",
+                radius:"4px", fontHeading:"'Cormorant Garamond', Georgia, serif" },
+    swatches: ["#1a0608","#f43f5e","#7f1d1d","#e11d48","#fff9fa"],
+    btnColor: "#be123c",
+  },
+  {
+    id: "etc",
+    name: "ETC",
+    description: "Identidad ETC Iberoamérica — sin cuadrícula",
+    video: { bg:"#1a1c38", surface:"#2d3177", text:"#f4f5f9", text2:"#9ea4c4", accent:"#e87020" },
+    ebook: { gridBg:"#ffffff", gridLine:"transparent", heading:"#2d3177", subheading:"#e87020",
+             text:"#313b44", calloutBg:"#f0f2fa", calloutBorder:"#2d3177",
+             fontHeading:"system-ui, Helvetica, sans-serif", objBadgeBg:"#eaebf7", objBadgeText:"#2d3177" },
+    activity: { bg:"#f4f5f9", surface:"#ffffff", border:"#d8dce8", text:"#1a1c38", text2:"#595e7a",
+                accent:"#e87020", accentLight:"#fff0e6", badgePractice:"#2d3177",
+                radius:"6px", fontHeading:"system-ui, Helvetica, sans-serif" },
+    swatches: ["#1a1c38","#2d3177","#e87020","#595959","#f4f5f9"],
+    btnColor: "#2d3177",
+    brand: true,
+  }
+];
+
+function buildCard(t) {
+  const v = t.video, e = t.ebook, a = t.activity;
+  const noGrid = e.gridLine === 'transparent';
+
+  return `
+<div class="theme-card${t.brand ? ' brand-card' : ''}" id="card-${t.id}" onclick="selectTheme('${t.id}')">
+
+  <!-- VIDEO PREVIEW -->
+  <div class="video-preview${noGrid ? '' : ' has-grid'}" style="background:${v.bg}; color:${v.text}">
+    <span class="label-video" style="color:${v.text2}">Video</span>
+    ${t.brand
+      ? `<span class="brand-badge">Identidad oficial</span>`
+      : `<span class="obj-tag" style="background:${v.accent}22; color:${v.accent}; border:1px solid ${v.accent}44">OBJETIVO 1.1</span>`
+    }
+    <div class="scene-title" style="font-family:${e.fontHeading}; color:${v.text}">
+      Principios de <span style="color:${v.accent}">${t.name}</span>
+    </div>
+    <div class="scene-sub" style="color:${v.text2}">
+      Desde los conceptos fundamentales hasta su aplicación en entornos reales de producción.
+    </div>
+    <div class="accent-bar" style="background:linear-gradient(90deg, ${v.accent}, ${v.accent}44)"></div>
+  </div>
+
+  <!-- EBOOK PREVIEW -->
+  <div class="ebook-preview" style="background:${e.gridBg}">
+    <div class="label-ebook">${noGrid ? 'Ebook HTML — sin cuadrícula' : 'Ebook HTML'}</div>
+    <div class="ebook-inner" style="background:${e.gridBg}; --grid-line:${e.gridLine}; ${noGrid ? 'border:1px solid #e8e8e8;' : ''}">
+      <span class="obj-badge" style="background:${e.objBadgeBg}; color:${e.objBadgeText}">
+        Objetivo de certificación · 1.1.1
+      </span>
+      <h3 style="font-family:${e.fontHeading}; color:${e.heading}">
+        Introducción a los protocolos de red
+      </h3>
+      <div class="callout" style="background:${e.calloutBg}; border-color:${e.calloutBorder}; color:${e.text}; font-family:${e.fontHeading}; font-size:0.72rem">
+        Los protocolos definen las reglas que permiten que dispositivos heterogéneos se comuniquen de forma fiable.
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY PREVIEW -->
+  <div class="activity-preview" style="background:${a.bg}">
+    <div class="label-act">Actividad interactiva</div>
+    <div class="act-card" style="border-color:${a.border}; --act-radius:${a.radius}; background:${a.surface}">
+      <div class="act-card-header" style="background:${a.bg}; border-bottom:1px solid ${a.border}">
+        <span class="act-badge" style="background:${a.badgePractice}">Práctica</span>
+        <span style="font-size:0.78rem; color:${a.text}; font-family:${a.fontHeading}; font-weight:600">
+          ¿Cuál opera en la capa de transporte?
+        </span>
+      </div>
+      <div class="act-card-body" style="background:${a.surface}">
+        <div class="act-option" style="border-color:${a.border}; background:${a.accentLight}; color:${a.text}; border-radius:${a.radius}">
+          <div class="dot" style="border-color:${a.accent}; background:${a.accent}"></div>
+          <span style="font-size:0.75rem; font-family:${a.fontHeading}">TCP — Transmission Control Protocol</span>
+        </div>
+        <div class="act-option" style="border-color:${a.border}; color:${a.text2}; border-radius:${a.radius}">
+          <div class="dot" style="border-color:${a.border}"></div>
+          <span style="font-size:0.75rem; font-family:${a.fontHeading}">HTTP — HyperText Transfer Protocol</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="theme-footer">
+    <div>
+      <div class="palette-swatches">
+        ${t.swatches.map(c => `<div class="swatch" style="background:${c}"></div>`).join('')}
+      </div>
+      <div class="theme-id-label" style="margin-top:5px">theme: "${t.id}"</div>
+    </div>
+    <button class="select-btn" style="background:${t.btnColor}; color:#fff"
+      onclick="event.stopPropagation(); selectTheme('${t.id}')">
+      Seleccionar
+    </button>
+  </div>
+
+</div>`;
+}
+
+function selectTheme(id) {
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-' + id).classList.add('selected');
+
+  const display = document.getElementById('selectedDisplay');
+  display.innerHTML = `theme: <span>"${id}"</span>  ← copia este valor en <code style="background:#1e293b;color:#38bdf8;padding:1px 5px;border-radius:3px;font-size:0.82em">course.config.js</code>`;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(id).then(() => showToast(`✓ "${id}" copiado al portapapeles`));
+  } else {
+    showToast(`Tema elegido: ${id}`);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+const grid = document.getElementById('themesGrid');
+themes.forEach(t => { grid.insertAdjacentHTML('beforeend', buildCard(t)); });
+</script>
+
+</body>
+</html>

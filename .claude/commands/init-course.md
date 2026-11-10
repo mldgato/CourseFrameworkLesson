@@ -71,10 +71,19 @@ mkdir -p "Unidad N - Nombre/Proyecto"
 ### 6. Sugerir escenario
 Si `scenario.name` está vacío, propone un nombre y descripción de empresa ficticia coherente con el tema del curso. Pide confirmación antes de escribirlo.
 
+### 7. Seleccionar estilo gráfico
+Indica al autor:
+
+> **Paso opcional: elige el estilo visual del curso.**
+> Abre `_tools/theme-gallery.html` en el navegador para ver una muestra de los 5 estilos disponibles (Ocean, Forest, Obsidian, Amber, Crimson). Cuando elijas uno, haz clic en **Seleccionar** — el ID se copiará al portapapeles — y luego escríbelo en `course.config.js → theme`. Por ahora el curso usa el estilo predeterminado `"ocean"`.
+
+No esperes confirmación para continuar; el autor puede cambiar el tema en cualquier momento editando `course.config.js`.
+
 ## Al terminar
 Muestra un resumen:
 - Cuántas unidades, lecciones y temas se extrajeron
 - Qué carpetas se crearon
 - Cuál es el escenario sugerido
+- Estilo gráfico activo (el valor actual de `course.config.js → theme`)
 
 Pregunta si el usuario quiere ajustar algo antes de continuar.

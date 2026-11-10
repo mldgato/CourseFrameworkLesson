@@ -24,6 +24,13 @@ produce su propio archivo HTML. El autor revisa todos al final.
 - **Preguntas del examen real:** si existe `certificación/preguntas_por_tema.json` (o `certificacion/`),
   extrae las preguntas de cada tema para verificar que el fragmento HTML cubre los conceptos clave
   que el examen evalúa (sin agregar quizzes; eso es exclusivo de las Actividades).
+- **Estilo gráfico:** lee `course.config.js → theme`, carga `_tools/themes.json` y localiza el
+  objeto con ese `id`. Extrae la sección `ebook` del tema: `gridBg`, `gridLine`, `heading`,
+  `subheading`, `text`, `calloutBg`, `calloutBorder`, `tableCellBg`, `fontHeading`, `fontBody`.
+  Si `googleFonts` no es vacío, inclúyelo como `<link rel="stylesheet">` antes del fragmento o
+  en el `<head>`. Usa estos valores en todos los estilos inline de cada fragmento de la lección.
+  Si el tema tiene `"noGrid": true`, omite completamente el `background-image` con
+  `linear-gradient` del contenedor exterior; usa solo `background: {ebook.gridBg}` liso.
 
 ### 2. Convertir o generar cada tema
 
@@ -45,20 +52,21 @@ Esto genera un archivo por tema. Luego verifica cada uno.
 
 ### 3. Reglas del fragmento (aplica a cada tema)
 
-**Estructura obligatoria:**
+**Estructura obligatoria** — usa los valores del tema cargado en el Paso 1:
 ```html
-<div style="background:#fbfdff; background-image: linear-gradient(#e3edf5 1px, transparent 1px), linear-gradient(90deg, #e3edf5 1px, transparent 1px); background-size: 26px 26px;">
-  <div style="max-width:900px; padding:0 24px; font-family:helvetica,arial,sans-serif">
+<div style="background:{ebook.gridBg}; background-image: linear-gradient({ebook.gridLine} 1px, transparent 1px), linear-gradient(90deg, {ebook.gridLine} 1px, transparent 1px); background-size: 26px 26px;">
+  <div style="max-width:900px; padding:0 24px; font-family:{ebook.fontBody}">
     <!-- contenido del tema aquí -->
   </div>
 </div>
 ```
 
-**Paleta** (desde `course.config.js → palette`):
-- Encabezados y negritas → `navy`
-- Subtítulos y acentos → `steel`
-- Texto → `#1e2f3f`; fondos de recuadro → `#eaf4fb`
-- Cada `<td>` lleva `background:#ffffff`
+**Paleta** (del tema activo, sección `ebook`):
+- Encabezados → color `heading`
+- Subtítulos y acentos → color `subheading`
+- Texto cuerpo → color `text`; fondos de recuadro → `calloutBg`
+- Borde izquierdo de callout → `calloutBorder`
+- Cada `<td>` lleva `background:{ebook.tableCellBg}`
 
 **Jerarquía:** título de tema → `<h2>`, subtítulo → `<h3>`, sub-subtítulo → `<h4>`
 

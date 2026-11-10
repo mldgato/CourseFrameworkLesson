@@ -25,6 +25,13 @@ El autor revisa todas las actividades en el navegador al final.
   razonamiento del examen real (si el examen usa dropdowns en código, usa `QuizDragMatch` o
   `QuizChoice`; si usa clasificación, usa `QuizSort`).
 - Para cada tema, lee su Word de teoría si existe y sus preguntas si existen.
+- **Estilo gráfico:** lee `course.config.js → theme`, carga `_tools/themes.json` y localiza el
+  objeto con ese `id`. Extrae la sección `activity` del tema: `primary`, `accent`, `accentLight`,
+  `background`, `surface`, `surfaceBorder`, `text`, `text2`, `badgePractice`, `badgeAnalogy`,
+  `borderRadius`, `fontHeading`, `fontBody`. Si `googleFonts` no es vacío, inclúyelo como
+  `<link rel="stylesheet">` en el `<head>`. Aplica estos valores en todos los estilos inline y
+  CSS de cada actividad de la lección. Si el tema tiene `"noGrid": true`, **no agregues ningún
+  patrón de cuadrícula** (`background-image` con `linear-gradient`) en ningún contenedor.
 
 ### 2. Generar la actividad de cada tema
 
@@ -39,9 +46,9 @@ El autor revisa todas las actividades en el navegador al final.
 3. **Evaluación** — 2–4 preguntas evaluables (o inyectadas desde el Word de preguntas si existe).
 
 **Reglas de diseño:**
-- Paleta slate + índigo, compatible con modo oscuro
+- Colores y tipografía: usa los valores del tema cargado en el Paso 1 (sección `activity.*`)
 - Sin scroll de página; el contenido va dentro de `.step`
-- Badge `practica` (índigo) o `analogia` (ámbar) según el tipo
+- Badge `practica` → color `badgePractice` del tema; badge `analogia` → color `badgeAnalogy`
 - Emojis permitidos
 - ID de la actividad: `{config.id}-X.Y.Z`
 
